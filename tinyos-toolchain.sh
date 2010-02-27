@@ -7,9 +7,15 @@ PATH=$prefix/bin:$PATH
 
 modules="nesc tinyos-tools stow"
 
-for module in $modules; do
-    $scriptdir/$module.sh download build install
-done
+if [[ $# -eq 0 ]]; then
+    for module in $modules; do
+        $scriptdir/$module.sh download build install
+    done
+elif [[ $1 == "cleanup" ]]; then
+    for module in $modules; do
+        $scriptdir/$module.sh cleanup
+    done
+fi
 
 # Local Variables:
 # indent-tabs-mode: nil
