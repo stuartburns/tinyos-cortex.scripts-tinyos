@@ -1,5 +1,5 @@
 #!/bin/bash
-# -*- mode: shell-script; mode: flyspell-prog -*-
+# -*- mode: shell-script; mode: flyspell-prog; -*-
 
 function error() {
     echo "$@" 1>&2
@@ -24,6 +24,7 @@ function add_path() {
     local path=$1 p
     shift
     for p in "$@"; do
+        [[ -d $p ]] || continue
         case $path in
         *$p*);;
         *) path=$p:$path;;
