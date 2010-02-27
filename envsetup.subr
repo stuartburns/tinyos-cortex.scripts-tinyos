@@ -26,6 +26,8 @@ else
 
         PATH=$(add_path $PATH $prefix/sbin $prefix/bin)
         MANPATH=$(add_path $MANPATH $prefix/man)
+
+        alias stow='command stow --ignore="CVS|\.git|\.hg|\.svn"'
     fi
 fi
 
