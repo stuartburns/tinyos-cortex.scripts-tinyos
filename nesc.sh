@@ -32,20 +32,16 @@ function prepare() {
     tar xzf $nesc.tar.gz
     mv $nesc $builddir
 
-    if [[ "$scriptdir/$nesc-fix_*.patch" ]]; then
-        for p in $scriptdir/$nesc-fix_*.patch; do
-            patch -d $builddir -p1 < $p \
-                || die "patch $p failed"
-        done
-    fi
+    for p in $scriptdir/$nesc-fix_*.patch; do
+        [[ -f $p ]] && patch -d $builddir -p1 < $p \
+            || die "patch $p failed"
+    done
 
     if is_osx_snow_leopard; then
-        if [[ "$scriptdir/$nesc-osx_*.patch" ]]; then
-            for p in $scriptdir/$nesc-osx_*.patch; do
-                patch -d $builddir -p1 < $p \
-                    || die "patch $p failed"
-            done
-        fi
+        for p in $scriptdir/$nesc-osx_*.patch; do
+            [[ -f $p ]] && patch -d $builddir -p1 < $p \
+                || die "patch $p failed"
+        done
     fi
     return 0
 }
