@@ -33,13 +33,15 @@ function prepare() {
     mv $nesc $builddir
 
     for p in $scriptdir/$nesc-fix_*.patch; do
-        [[ -f $p ]] && patch -d $builddir -p1 < $p \
+        [[ -f $p ]] || continue
+        patch -d $builddir -p1 < $p \
             || die "patch $p failed"
     done
 
     if is_osx_snow_leopard; then
         for p in $scriptdir/$nesc-osx_*.patch; do
-            [[ -f $p ]] && patch -d $builddir -p1 < $p \
+            [[ -f $p ]] || continue
+            patch -d $builddir -p1 < $p \
                 || die "patch $p failed"
         done
     fi
