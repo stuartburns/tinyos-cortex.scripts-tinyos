@@ -23,7 +23,7 @@ target=$(uname)
 prefix=/opt/tinyos
 
 # tinyos
-repo_tinyos=:pserver:anonymous@tinyos.cvs.sourceforge.net:/cvsroot/tinyos
+repo_tinyos=http://tinyos-main.googlecode.com/svn/trunk
 tinyos=tinyos-2.x
 
 # nesc
