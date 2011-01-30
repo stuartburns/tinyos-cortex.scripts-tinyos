@@ -22,9 +22,9 @@ function download() {
     cd $buildtop
     rm -rf $builddir
     if [[ -d $tinyos ]]; then
-        cd $tinyos; cvs -q up; cd ..;
+        cd $tinyos; svn up; cd ..;
     else
-        cvs -q -d $repo_tinyos co -P $tinyos \
+        svn checkout $repo_tinyos $tinyos \
             || die "can not fetch from cvs repository";
     fi
     return 0
@@ -35,11 +35,13 @@ function prepare() {
     rm -rf $builddir
     cp -R $tinyos $builddir \
         || die "can not copy $tinyos"
-    for p in $scriptdir/tinyos-tools-*.patch; do
-        [[ -f $p ]] || continue
-        patch -d $builddir -p1 < $p \
-            || die "patch $p failed"
-    done
+    if is_osx; then
+        for p in $scriptdir/tinyos-tools-osx_*.patch; do
+            [[ -f $p ]] || continue
+            patch -d $builddir -p0 < $p \
+                || die "patch $p failed"
+        done
+    fi
     return 0
 }
 
