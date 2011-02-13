@@ -41,7 +41,7 @@ function download() {
         cd $tinyos; svn up; cd ..;
     else
         svn checkout $repo_tinyos $tinyos \
-            || die "can not fetch from cvs repository";
+            || die "can not fetch from subversion repository";
     fi
     return 0
 }
@@ -51,6 +51,11 @@ function prepare() {
     rm -rf $builddir
     cp -R $tinyos $builddir \
         || die "can not copy $tinyos"
+    for p in $scriptdir/tinyos-tools-all_*.patch; do
+        [[ -f $p ]] || continue
+        patch -d $builddir -p0 < $p \
+            || die "patch $p failed"
+    done
     if is_osx; then
         for p in $scriptdir/tinyos-tools-osx_*.patch; do
             [[ -f $p ]] || continue

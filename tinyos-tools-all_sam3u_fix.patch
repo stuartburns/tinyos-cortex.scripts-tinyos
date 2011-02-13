@@ -1,0 +1,10 @@
+Index: tools/platforms/Makefile.am
+===================================================================
+--- tools/platforms/Makefile.am	(revision 5389)
++++ tools/platforms/Makefile.am	(working copy)
+@@ -1,4 +1,4 @@
+ AUTOMAKE_OPTIONS = foreign
+ 
+-SUBDIRS = mica msp430 sam3u
++SUBDIRS = mica msp430
+ 
