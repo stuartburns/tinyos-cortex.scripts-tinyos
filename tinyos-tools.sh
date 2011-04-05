@@ -49,7 +49,8 @@ function download() {
 function prepare() {
     cd $buildtop
     rm -rf $builddir
-    cp -R $tinyos $builddir \
+    mkdir $builddir
+    tar cf - -C $tinyos --exclude .svn . | tar xf - -C $builddir \
         || die "can not copy $tinyos"
     for p in $scriptdir/tinyos-tools-all_*.patch; do
         [[ -f $p ]] || continue
