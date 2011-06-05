@@ -36,9 +36,7 @@
 
 function download() {
     cd $buildtop
-    [[ -f $nesc.tar.gz ]] \
-        || fetch $url_nesc $nesc.tar.gz \
-        || die "can not download $nesc.tar.gz from $url_nesc"
+    fetch $url_nesc $nesc.tar.gz
     return 0
 }
 
