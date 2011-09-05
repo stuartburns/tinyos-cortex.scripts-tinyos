@@ -52,18 +52,11 @@ function prepare() {
     mkdir $builddir
     tar cf - -C $tinyos --exclude .svn . | tar xf - -C $builddir \
         || die "can not copy $tinyos"
-    for p in $scriptdir/tinyos-tools-all_*.patch; do
+    for p in $scriptdir/$tinyos-tools_*.patch; do
         [[ -f $p ]] || continue
         patch -d $builddir -p0 < $p \
             || die "patch $p failed"
     done
-    if is_osx; then
-        for p in $scriptdir/tinyos-tools-osx_*.patch; do
-            [[ -f $p ]] || continue
-            patch -d $builddir -p0 < $p \
-                || die "patch $p failed"
-        done
-    fi
     return 0
 }
 
