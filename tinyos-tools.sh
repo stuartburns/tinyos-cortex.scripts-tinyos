@@ -54,7 +54,7 @@ function prepare() {
         || die "can not copy $tinyos"
     for p in $scriptdir/$tinyos-tools_*.patch; do
         [[ -f $p ]] || continue
-        patch -d $builddir -p0 < $p \
+        patch -d $builddir -p1 < $p \
             || die "patch $p failed"
     done
     return 0
