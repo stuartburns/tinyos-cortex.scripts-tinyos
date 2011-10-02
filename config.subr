@@ -40,8 +40,8 @@ prefix=/opt/tinyos
 
 # tinyos
 repo_tinyos_base=http://tinyos-main.googlecode.com/svn
-release_tinyos=tinyos-2.1.1.3
-#release_tinyos=current
+#release_tinyos=tinyos-2.1.1.3
+release_tinyos=current
 
 # nesc
 nesc=nesc-1.3.3
