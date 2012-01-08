@@ -36,15 +36,28 @@
 
 function download() {
     cd $buildtop
-    fetch $url_nesc $nesc.tar.gz
+    if [[ $release_nesc == current ]]; then
+        if [[ -d $nesc ]]; then
+            cd $nesc; cvs -q up; cd ..;
+        else
+            cvs -z3 -d $repo_nesc co -P $nesc
+        fi
+    else
+        fetch $repo_nesc $nesc.tar.gz
+    fi
     return 0
 }
 
 function prepare() {
     cd $buildtop
     rm -rf $builddir
-    tar xzf $nesc.tar.gz
-    mv $nesc $builddir
+    if [[ $release_nesc == current ]]; then
+        mkdir $builddir
+        tar cf - -C $nesc . | tar xf - --exclude CVS -C $builddir
+    else
+        tar xzf $nesc.tar.gz
+        mv $nesc $builddir
+    fi
 
     for p in $scriptdir/$nesc-fix_*.patch; do
         [[ -f $p ]] || continue
@@ -64,6 +77,9 @@ function prepare() {
 
 function build() {
     cd $builddir
+    if [[ $release_nesc == current ]]; then
+        ./Bootstrap
+    fi
     ./configure --prefix=$prefix --disable-nls \
         || die "configure failed"
     make -j$(num_cpus) \
