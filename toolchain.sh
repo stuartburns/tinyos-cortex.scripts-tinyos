@@ -36,7 +36,7 @@
 
 PATH=$prefix/bin:$PATH
 
-modules="nesc tinyos-tools stow"
+modules="nesc tinyos-tools"
 
 if [[ $# -eq 0 ]]; then
     for module in $modules; do
