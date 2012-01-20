@@ -35,12 +35,12 @@
 . $(dirname $0 )/main.subr
 
 function download() {
-    cd $buildtop
+    do_cd $buildtop
     if [[ $release_nesc == current ]]; then
         if [[ -d $nesc ]]; then
-            cd $nesc; cvs -q up; cd ..;
+            do_cd $nesc; do_cmd cvs -q up; do_cd ..;
         else
-            cvs -z3 -d $repo_nesc co -P $nesc
+            do_cmd cvs -z3 -d $repo_nesc co -P $nesc
         fi
     else
         fetch $repo_nesc $nesc.tar.gz
@@ -49,26 +49,26 @@ function download() {
 }
 
 function prepare() {
-    cd $buildtop
-    rm -rf $builddir
+    do_cd $buildtop
+    do_cmd rm -rf $builddir
     if [[ $release_nesc == current ]]; then
-        mkdir $builddir
-        tar cf - -C $nesc . | tar xf - --exclude CVS -C $builddir
+        do_cmd mkdir $builddir
+        do_cmd "tar cf - -C $nesc . | tar xf - --exclude CVS -C $builddir"
     else
-        tar xzf $nesc.tar.gz
-        mv $nesc $builddir
+        do_cmd tar xzf $nesc.tar.gz
+        do_cmd mv $nesc $builddir
     fi
 
     for p in $scriptdir/$nesc-fix_*.patch; do
         [[ -f $p ]] || continue
-        patch -d $builddir -p1 < $p \
+        do_cmd "patch -d $builddir -p1 < $p" \
             || die "patch $p failed"
     done
 
     if is_osx_snow_leopard; then
         for p in $scriptdir/$nesc-osx_*.patch; do
             [[ -f $p ]] || continue
-            patch -d $builddir -p1 < $p \
+            do_cmd "patch -d $builddir -p1 < $p" \
                 || die "patch $p failed"
         done
     fi
@@ -76,24 +76,24 @@ function prepare() {
 }
 
 function build() {
-    cd $builddir
+    do_cd $builddir
     if [[ $release_nesc == current ]]; then
-        ./Bootstrap
+        do_cmd ./Bootstrap
     fi
-    ./configure --prefix=$prefix --disable-nls \
+    do_cmd ./configure --prefix=$prefix --disable-nls \
         || die "configure failed"
-    make -j$(num_cpus) \
+    do_cmd make -j$(num_cpus) \
         || die "make filed"
 }
 
 function install() {
-    cd $builddir
-    sudo make install
+    do_cd $builddir
+    do_cmd sudo make -j$(num_cpus) install
 }
 
 function cleanup() {
-    cd $buildtop
-    rm -rf $builddir
+    do_cd $buildtop
+    do_cmd rm -rf $builddir
 }
 
 main "$@"

@@ -35,49 +35,49 @@
 . $(dirname $0)/main.subr
 
 function download() {
-    cd $buildtop
-    rm -rf $builddir
+    do_cd $buildtop
+    do_cmd rm -rf $builddir
     if [[ -d $tinyos ]]; then
-        cd $tinyos; svn up; cd ..;
+        do_cd $tinyos; do_cmd svn up; do_cd ..;
     else
-        svn checkout $repo_tinyos $tinyos \
+        do_cmd svn checkout $repo_tinyos $tinyos \
             || die "can not fetch from subversion repository";
     fi
     return 0
 }
 
 function prepare() {
-    cd $buildtop
-    rm -rf $builddir
-    mkdir $builddir
-    tar cf - -C $tinyos --exclude .svn . | tar xf - -C $builddir \
+    do_cd $buildtop
+    do_cmd rm -rf $builddir
+    do_cmd mkdir $builddir
+    do_cmd "tar cf - -C $tinyos --exclude .svn . | tar xf - -C $builddir" \
         || die "can not copy $tinyos"
     for p in $scriptdir/$tinyos-tools_*.patch; do
         [[ -f $p ]] || continue
-        patch -d $builddir -p1 < $p \
+        do_cmd "patch -d $builddir -p1 < $p" \
             || die "patch $p failed"
     done
     return 0
 }
 
 function build() { 
-    cd $builddir/tools
-    ./Bootstrap \
+    do_cd $builddir/tools
+    do_cmd ./Bootstrap \
         || die "bootstrap failed"
-    ./configure --prefix=$prefix --disable-nls \
+    do_cmd ./configure --prefix=$prefix --disable-nls \
         || die "configure failed"
-    make -j$(num_cpus) \
+    do_cmd make -j$(num_cpus) \
         || die "make failed"
 }
 
 function install() {
-    cd $builddir/tools
-    sudo make install
+    do_cd $builddir/tools
+    do_cmd sudo make -j$(num_cpus) install
 }
 
 function cleanup() {
-    cd $buildtop
-    rm -rf $builddir
+    do_cd $buildtop
+    do_cmd rm -rf $builddir
 }
 
 main "$@"
