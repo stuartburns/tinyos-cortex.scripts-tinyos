@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/bin/bash -u
 # -*- mode: shell-script; mode: flyspell-prog; -*-
 #
-# Copyright (c) 2010, Tadashi G Takaoka
+# Copyright (c) 2012, Tadashi G Takaoka
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -32,56 +32,68 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-source $(dirname ${BASH_ARGV[0]})/func.subr
-source $(dirname ${BASH_ARGV[0]})/path.subr
+source $(dirname $0)/main.subr
+source $(dirname $0)/tinyos-main.subr
 
-which svn >/dev/null || die "missing svn"
-which git >/dev/null || die "missing git"
-
-scriptsdir=$(absolute_path $(dirname $0))
-scriptname=$(basename $0 .sh)
-buildtop=$PWD
-
-source $scriptsdir/config.subr
-builddir=$buildtop/build-$buildtarget-$scriptname
-
-function usage {
-    die "usage: $0 [--help|-h] [download|build|install|clean|cleanup...]"
-}
-
-function main() {
-    local i cmd
-    local -a cmds
-
-    for i in "$@"; do
-        case $i in
-            -h|--help) usage;;
-            -*) die "unkown option $i, try --help";;
-            *) cmds+=($i);;
-        esac
-    done
-
-    PATH=$prefix/bin:$PATH
-    if [[ ${#cmds[@]} -eq 0 ]]; then
-        download && prepare && build
-        echo "To install $scriptname under $prefix, run '$0 install'"
+function tinyos_main::repo() {
+    local release=$tinyos_main_release
+    if [[ $release == current ]]; then
+        echo $tinyos_main_repo/trunk
     else
-        for cmd in "${cmds[@]}"; do
-            case $cmd in
-            download)
-                download || die "download failed";;
-            build)
-                prepare && build || die "build failed";;
-            install)
-                install || die "install failed";;
-            clean|cleanup)
-                cleanup;;
-            *)
-                die "unknown command '$cmd'";;
-            esac
-        done
+        local version=$(tinyos_main::version)
+        echo $tinyos_main_repo/tags/release_tinyos_${version//./_}
     fi
 }
+
+function download() {
+    tinyos_main::config
+    [[ -d $tinyos_src ]] || do_cmd sudo mkdir -p $tinyos_src
+    local dir=$tinyos_src/$tinyos_main
+    clone --sudo svn $(tinyos_main::repo) $dir
+    return 0
+}
+
+function prepare() {
+    tinyos_main::config
+    copy $tinyos_src/$tinyos_main $builddir
+    for p in $scriptsdir/${tinyos_main}_*.patch; do
+        do_patch $builddir $p -p1
+    done
+    return 0
+}
+
+function build() {
+    tinyos_main::config
+    do_cd $builddir/tools
+    do_cmd ./Bootstrap \
+        || die "bootstrap failed"
+    do_cmd ./configure --prefix=$prefix --disable-nls \
+        || die "configure failed"
+    do_cmd make -j$(num_cpus) \
+        || die "make failed"
+}
+
+function install() { 
+    tinyos_main::config
+    do_cd $builddir/tools
+    do_cmd sudo make -j$(num_cpus) install
+
+    [[ -d $tinyos_root ]] \
+        || do_cmd sudo mkdir -p $tinyos_root
+    [[ -d $tinyos_stow ]] \
+        || do_cmd sudo mkdir -p $tinyos_stow
+    do_cd $tinyos_stow
+    do_cmd "sudo rm -f tinyos-2.*"
+    do_cmd "sudo ln -s $tinyos_src/$tinyos_main ."
+    do_cmd "sudo stow -R -t $tinyos_root *"
+}
+
+function cleanup() {
+    tinyos_main::config
+    do_cmd rm -rf $builddir
+}
+
+main "$@"
 
 # Local Variables:
 # indent-tabs-mode: nil

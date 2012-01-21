@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/bin/bash -u
 # -*- mode: shell-script; mode: flyspell-prog; -*-
 #
-# Copyright (c) 2010, Tadashi G Takaoka
+# Copyright (c) 2012, Tadashi G Takaoka
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -32,56 +32,67 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-source $(dirname ${BASH_ARGV[0]})/func.subr
-source $(dirname ${BASH_ARGV[0]})/path.subr
+source $(dirname $0)/main.subr
+source $(dirname $0)/tinyos-main.subr
 
-which svn >/dev/null || die "missing svn"
-which git >/dev/null || die "missing git"
-
-scriptsdir=$(absolute_path $(dirname $0))
-scriptname=$(basename $0 .sh)
-buildtop=$PWD
-
-source $scriptsdir/config.subr
-builddir=$buildtop/build-$buildtarget-$scriptname
-
-function usage {
-    die "usage: $0 [--help|-h] [download|build|install|clean|cleanup...]"
-}
-
-function main() {
-    local i cmd
-    local -a cmds
-
-    for i in "$@"; do
-        case $i in
-            -h|--help) usage;;
-            -*) die "unkown option $i, try --help";;
-            *) cmds+=($i);;
-        esac
-    done
-
-    PATH=$prefix/bin:$PATH
-    if [[ ${#cmds[@]} -eq 0 ]]; then
-        download && prepare && build
-        echo "To install $scriptname under $prefix, run '$0 install'"
+function tinyos_msp430::version() {
+    local relase=$tinyos_msp430_release
+    if [[ $release == current ]]; then
+        echo tinyos-msp430
     else
-        for cmd in "${cmds[@]}"; do
-            case $cmd in
-            download)
-                download || die "download failed";;
-            build)
-                prepare && build || die "build failed";;
-            install)
-                install || die "install failed";;
-            clean|cleanup)
-                cleanup;;
-            *)
-                die "unknown command '$cmd'";;
-            esac
-        done
+        echo $release
     fi
 }
+
+function tinyos_msp430::config() {
+    tinyos_main::config
+    tinyos_msp430=$(tinyos_msp430::version)
+}
+
+function download() {
+    tinyos_msp430::config
+
+    if [[ $tinyos_msp430_release == current ]]; then
+        clone --sudo git $tinyos_msp430_repo $tinyos_src/$tinyos_msp430
+    else
+        fetch $tinyos_msp430_url/$tinyos_msp430.tar.gz
+    fi
+    return 0
+}
+
+function prepare() {
+    return 0
+}
+
+function build() {
+    return 0
+}
+
+function install() {
+    tinyos_msp430::config
+
+    if [[ $tinyos_msp430_release == current ]]; then
+        :
+    else
+        [[ -d $tinyos_src ]] || do_cmd sudo mkdir -p $tinyos_src
+        copy --sudo $tinyos_msp430.tar.gz $tinyos_src/$tinyos_msp430
+    fi
+
+    [[ -d $tinyos_root ]] \
+        || do_cmd sudo mkdir -p $tinyos_root
+    [[ -d $tinyos_stow ]] \
+        || do_cmd sudo mkdir -p $tinyos_stow
+    do_cd $tinyos_stow
+    do_cmd "sudo rm -f tinyos-msp430*"
+    do_cmd "sudo ln -s $tinyos_src/$tinyos_msp430 ."
+    do_cmd "sudo stow -R -t $tinyos_root *"
+}
+
+function cleanup() {
+    return 0
+}
+
+main "$@"
 
 # Local Variables:
 # indent-tabs-mode: nil

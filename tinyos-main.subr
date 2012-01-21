@@ -1,4 +1,4 @@
-#!/bin/bash -u
+#!/bin/bash
 # -*- mode: shell-script; mode: flyspell-prog; -*-
 #
 # Copyright (c) 2010, Tadashi G Takaoka
@@ -32,55 +32,22 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-. $(dirname $0)/main.subr
-
-function download() {
-    do_cd $buildtop
-    do_cmd rm -rf $builddir
-    if [[ -d $tinyos ]]; then
-        do_cd $tinyos; do_cmd svn up; do_cd ..;
+function tinyos_main::version() {
+    local release=$tinyos_main_release
+    if [[ $release == current ]]; then
+        echo tinyos-2.x
     else
-        do_cmd svn checkout $repo_tinyos $tinyos \
-            || die "can not fetch from subversion repository";
+        echo $release
     fi
-    return 0
 }
 
-function prepare() {
+function tinyos_main::config() {
     do_cd $buildtop
-    do_cmd rm -rf $builddir
-    do_cmd mkdir $builddir
-    do_cmd "tar cf - -C $tinyos --exclude .svn . | tar xf - -C $builddir" \
-        || die "can not copy $tinyos"
-    for p in $scriptdir/$tinyos-tools_*.patch; do
-        [[ -f $p ]] || continue
-        do_cmd "patch -d $builddir -p1 < $p" \
-            || die "patch $p failed"
-    done
-    return 0
+    tinyos_main=$(tinyos_main::version)
+    tinyos_root=$prefix/root
+    tinyos_src=$prefix/sources
+    tinyos_stow=$tinyos_src/stow
 }
-
-function build() { 
-    do_cd $builddir/tools
-    do_cmd ./Bootstrap \
-        || die "bootstrap failed"
-    do_cmd ./configure --prefix=$prefix --disable-nls \
-        || die "configure failed"
-    do_cmd make -j$(num_cpus) \
-        || die "make failed"
-}
-
-function install() {
-    do_cd $builddir/tools
-    do_cmd sudo make -j$(num_cpus) install
-}
-
-function cleanup() {
-    do_cd $buildtop
-    do_cmd rm -rf $builddir
-}
-
-main "$@"
 
 # Local Variables:
 # indent-tabs-mode: nil

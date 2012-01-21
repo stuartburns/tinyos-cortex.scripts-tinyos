@@ -32,54 +32,47 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-. $(dirname $0 )/main.subr
+source $(dirname $0 )/main.subr
+
+function nesc::config() {
+    do_cd $buildtop
+    if [[ $nesc_release == current ]]; then
+        nesc=nesc
+    else
+        nesc=$nesc_release
+    fi
+}
 
 function download() {
-    do_cd $buildtop
-    if [[ $release_nesc == current ]]; then
-        if [[ -d $nesc ]]; then
-            do_cd $nesc; do_cmd cvs -q up; do_cd ..;
-        else
-            do_cmd cvs -z3 -d $repo_nesc co -P $nesc
-        fi
+    nesc::config
+    if [[ $nesc_release == current ]]; then
+        clone cvs $nesc_repo $nesc
     else
-        fetch $repo_nesc $nesc.tar.gz
+        local version=${nesc#nesc-}
+        local url=$nesc_url/v$version/$nesc.tar.gz/download
+        fetch $url $nesc.tar.gz
     fi
     return 0
 }
 
 function prepare() {
-    do_cd $buildtop
-    do_cmd rm -rf $builddir
-    if [[ $release_nesc == current ]]; then
-        do_cmd mkdir $builddir
-        do_cmd "tar cf - -C $nesc . | tar xf - --exclude CVS -C $builddir"
+    nesc::config
+    if [[ $nesc_release == current ]]; then
+        copy $nesc $builddir
     else
-        do_cmd tar xzf $nesc.tar.gz
-        do_cmd mv $nesc $builddir
+        copy $nesc.tar.gz $builddir
     fi
 
-    for p in $scriptdir/$nesc-fix_*.patch; do
-        [[ -f $p ]] || continue
-        do_cmd "patch -d $builddir -p1 < $p" \
-            || die "patch $p failed"
+    for p in $scriptsdir/$nesc-fix_*.patch; do
+        do_patch $builddir $p
     done
 
-    if is_osx_snow_leopard; then
-        for p in $scriptdir/$nesc-osx_*.patch; do
-            [[ -f $p ]] || continue
-            do_cmd "patch -d $builddir -p1 < $p" \
-                || die "patch $p failed"
-        done
-    fi
     return 0
 }
 
 function build() {
     do_cd $builddir
-    if [[ $release_nesc == current ]]; then
-        do_cmd ./Bootstrap
-    fi
+    [[ $nesc_release == current ]] && do_cmd ./Bootstrap
     do_cmd ./configure --prefix=$prefix --disable-nls \
         || die "configure failed"
     do_cmd make -j$(num_cpus) \
@@ -91,8 +84,7 @@ function install() {
     do_cmd sudo make -j$(num_cpus) install
 }
 
-function cleanup() {
-    do_cd $buildtop
+function cleanup() { 
     do_cmd rm -rf $builddir
 }
 

@@ -34,19 +34,19 @@
 
 # We must not exit this script because this may be a part of login script.
 
-scriptdir=$(dirname ${BASH_ARGV[0]})
-if [[ ! -f $scriptdir/func.subr ]]; then
-    echo "$scriptdir/func.subr not found" 1>&2
+scriptsdir=$(dirname ${BASH_ARGV[0]})
+if [[ ! -f $scriptsdir/path.subr ]]; then
+    echo "$scriptsdir/path.subr not found" 1>&2
 else
-    . $scriptdir/func.subr
-    scriptdir=$(absolute_path $scriptdir)
+    . $scriptsdir/path.subr
+    scriptsdir=$(absolute_path $scriptsdir)
 
-    if [[ ! -f $scriptdir/config.subr ]]; then
-        echo "$scriptdir/config.subr not found" 1>&2
+    if [[ ! -f $scriptsdir/config.subr ]]; then
+        echo "$scriptsdir/config.subr not found" 1>&2
     else
-        . $scriptdir/config.subr
+        . $scriptsdir/config.subr
 
-        TOSROOT=$prefix/tinyos-2.x
+        TOSROOT=$prefix/root
         TOSDIR=$TOSROOT/tos
         MAKERULES=$TOSROOT/support/make/Makerules
         CLASSPATH=$(add_path $CLASSPATH $TOSROOT/support/sdk/java/tinyos.jar)
