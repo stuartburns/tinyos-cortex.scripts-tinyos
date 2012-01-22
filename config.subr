@@ -44,8 +44,8 @@ nesc_release=nesc-1.3.3
 
 # tinyos main
 tinyos_main_repo=http://tinyos-main.googlecode.com/svn
-#tinyos_main_release=tinyos-2.1.1.3
-tinyos_main_release=current
+tinyos_main_release=tinyos-2.1.1.3
+#tinyos_main_release=current
 
 # tinyos msp430
 tinyos_msp430_repo=https://code.google.com/p/tinyos-msp430.tinyos-msp430/
