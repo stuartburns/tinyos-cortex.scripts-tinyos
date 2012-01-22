@@ -35,27 +35,27 @@
 source $(dirname $0)/main.subr
 source $(dirname $0)/tinyos-main.subr
 
-function tinyos_msp430::version() {
-    local relase=$tinyos_msp430_release
+function tinyos_cortex::version() {
+    local release=$tinyos_cortex_release
     if [[ $release == current ]]; then
-        echo tinyos-msp430
+        echo tinyos-cortex
     else
         echo $release
     fi
 }
 
-function tinyos_msp430::config() {
+function tinyos_cortex::config() {
     tinyos_main::config
-    tinyos_msp430=$(tinyos_msp430::version)
+    tinyos_cortex=$(tinyos_cortex::version)
 }
 
 function download() {
-    tinyos_msp430::config
+    tinyos_cortex::config
 
-    if [[ $tinyos_msp430_release == current ]]; then
-        clone --sudo git $tinyos_msp430_repo $tinyos_src/$tinyos_msp430
+    if [[ $tinyos_cortex_release == current ]]; then
+        clone --sudo git $tinyos_cortex_repo $tinyos_src/$tinyos_cortex
     else
-        fetch $tinyos_msp430_url/$tinyos_msp430.tar.gz
+        fetch $tinyos_cortex_url/$tinyos_cortex.tar.gz
     fi
     return 0
 }
@@ -69,13 +69,13 @@ function build() {
 }
 
 function install() {
-    tinyos_msp430::config
+    tinyos_cortex::config
 
-    if [[ $tinyos_msp430_release == current ]]; then
+    if [[ $tinyos_cortex_release == current ]]; then
         :
     else
         [[ -d $tinyos_src ]] || do_cmd sudo mkdir -p $tinyos_src
-        copy --sudo $tinyos_msp430.tar.gz $tinyos_src/$tinyos_msp430
+        copy --sudo $tinyos_cortex.tar.gz $tinyos_src/$tinyos_cortex
     fi
 
     [[ -d $tinyos_root ]] \
@@ -83,8 +83,8 @@ function install() {
     [[ -d $tinyos_stow ]] \
         || do_cmd sudo mkdir -p $tinyos_stow
     do_cd $tinyos_stow
-    do_cmd "sudo rm -f tinyos-msp430*"
-    do_cmd "sudo ln -s $tinyos_src/$tinyos_msp430 ."
+    do_cmd "sudo rm -f tinyos-cortex*"
+    do_cmd "sudo ln -s $tinyos_src/$tinyos_cortex ."
     do_cmd "sudo stow -R -t $tinyos_root *"
 }
 

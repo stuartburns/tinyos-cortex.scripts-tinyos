@@ -36,7 +36,7 @@ source $(dirname $0)/main.subr
 
 PATH=$prefix/bin:$PATH
 
-modules="nesc tinyos-main tinyos-msp430 scripts"
+modules="nesc tinyos-main tinyos-cortex scripts"
 
 if [[ $# -eq 0 ]]; then
     for module in $modules; do

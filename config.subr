@@ -34,7 +34,7 @@
 
 # install prefix
 prefix=/opt/tinyos
-buildtarget=tinyos-msp430
+buildtarget=tinyos-cortex
 
 # nesc
 nesc_url=http://sourceforge.net/projects/nescc/files/nescc
@@ -47,11 +47,11 @@ tinyos_main_repo=http://tinyos-main.googlecode.com/svn
 tinyos_main_release=tinyos-2.1.1.3
 #tinyos_main_release=current
 
-# tinyos msp430
-tinyos_msp430_repo=https://code.google.com/p/tinyos-msp430.tinyos-msp430/
-tinyos_msp430_url=http://tinyos-msp430.googlecode.com/files
-#tinyos_msp430_release=tinyos-msp430-0.5
-tinyos_msp430_release=current
+# tinyos cortex
+tinyos_cortex_repo=https://code.google.com/p/tinyos-cortex.tinyos-cortex/
+tinyos_cortex_url=http://tinyos-cortex.googlecode.com/files
+#tinyos_cortex_release=tinyos-cortex-0.1
+tinyos_cortex_release=current
 
 # Local Variables:
 # indent-tabs-mode: nil

@@ -41,7 +41,7 @@ function tinyos_main::repo() {
         echo $tinyos_main_repo/trunk
     else
         local version=$(tinyos_main::version)
-        echo $tinyos_main_repo/tags/release_tinyos_${version//./_}
+        echo $tinyos_main_repo/tags/release_${version//[-.]/_}
     fi
 }
 
