@@ -34,32 +34,50 @@
 
 # We must not exit this script because this may be a part of login script.
 
-scriptsdir=$(dirname ${BASH_ARGV[0]})
-if [[ ! -f $scriptsdir/path.subr ]]; then
-    echo "$scriptsdir/path.subr not found" 1>&2
-else
-    . $scriptsdir/path.subr
-    scriptsdir=$(absolute_path $scriptsdir)
-
+function tinyos_cortex::config() {
+    local scriptsdir=$(dirname ${BASH_SOURCE[0]})
+    if [[ $(type -t add_path) != function ]]; then
+        if [[ ! -f $scriptsdir/path.subr ]]; then
+            echo "$scriptsdir/path.subr not found" 1>&2
+            return 1
+        fi
+        $scriptsdir/path.subr
+        scriptsdir=$(absolute_path $scriptsdir)
+    fi
+    
     if [[ ! -f $scriptsdir/config.subr ]]; then
         echo "$scriptsdir/config.subr not found" 1>&2
-    else
-        . $scriptsdir/config.subr
-
-        TOSROOT=$prefix/root
-        TOSDIR=$TOSROOT/tos
-        MAKERULES=$TOSROOT/support/make/Makerules
-        CLASSPATH=$(add_path $CLASSPATH $TOSROOT/support/sdk/java/tinyos.jar)
-
-        export TOSROOT
-        export TOSDIR
-        export CLASSPATH
-        export MAKERULES
-
-        PATH=$(add_path $PATH $prefix/sbin $prefix/bin)
-        MANPATH=$(add_path $MANPATH $prefix/man)
+        return 1
     fi
-fi
+
+    local prefix buildtarget
+    local nesc_url nesc_repo nesc_release
+    local tinyos_main_repo tinyos_main_release
+    local tinyos_cortex_repo tinyos_cortex_url tinyos_cortex_release
+    source $scriptsdir/config.subr
+
+    if [[ $# -eq 1 ]]; then
+        echo ${!1}
+        return
+    fi
+
+    source $scriptsdir/config.subr
+
+    TOSROOT=$prefix/root
+    TOSDIR=$TOSROOT/tos
+    MAKERULES=$TOSROOT/support/make/Makerules
+    CLASSPATH=$(add_path $CLASSPATH $TOSROOT/support/sdk/java/tinyos.jar)
+
+    export TOSROOT
+    export TOSDIR
+    export CLASSPATH
+    export MAKERULES
+
+    PATH=$(add_path $PATH $prefix/sbin $prefix/bin)
+    MANPATH=$(add_path $MANPATH $prefix/man)
+}
+
+tinyos_cortex::config
 
 # Local Variables:
 # indent-tabs-mode: nil
