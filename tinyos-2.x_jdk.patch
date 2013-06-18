@@ -1,0 +1,46 @@
+diff -ru tinyos-2.x/tools/configure.ac build-tinyos-tools/tools/configure.ac
+--- tinyos-2.x/tools/configure.ac	2012-08-02 01:11:15.000000000 +0900
++++ build-tinyos-tools/tools/configure.ac	2012-08-02 02:09:39.000000000 +0900
+@@ -101,7 +101,7 @@
+ if test $? -ne 0; then
+   AC_ERROR(java not found)
+ fi
+-JDK=`dirname "$JAVAC_DIR"`
++JDK=`/bin/sh tinyos/misc/tos-locate-jre --jni`
+ AC_MSG_RESULT($JDK)
+ 
+ function jnimap {
+diff -ru tinyos-2.x/tools/tinyos/misc/tos-locate-jre build-tinyos-tools/tools/tinyos/misc/tos-locate-jre
+--- tinyos-2.x/tools/tinyos/misc/tos-locate-jre	2012-08-02 01:11:11.000000000 +0900
++++ build-tinyos-tools/tools/tinyos/misc/tos-locate-jre	2012-08-02 02:07:16.000000000 +0900
+@@ -56,7 +56,7 @@
+     ;;
+ 
+     Darwin)
+-    ## This should work bu the symlinks are broken. Apple bug, I suppose :)
++    ## This should work but the symlinks are broken. Apple bug, I suppose :)
+     #jhome=/System/Library/Frameworks/JavaVM.framework/Versions/Current
+     ## The real location is under /Developer/SDKs/MacOSX*.sdk/
+     ## but now how do we determin the version correctly ?
+@@ -134,7 +134,11 @@
+     # Windows, and IBM Java: in jre/bin
+     # Sun Java on Linux: in jre/lib/i386
+     if [ `uname` = "Darwin" ]; then 
+-	jnilocate "/Library/Java/Extensions"
++        if [ ${pv} = "10.8" -o ${pv} = "10.7" ]; then
++            jnilocate "/System/Library/Frameworks/JavaVM.framework/Versions/Current"
++        else
++            jnilocate "/Library/Java/Extensions"
++        fi
+     elif "$jhome/bin/java" -version 2>&1 | grep -q IBM || cygpath -w / >/dev/null 2>/dev/null; then
+ 	jnilocate "$jhome/jre/bin" || jnilocate "$jhome/bin"
+     else
+@@ -147,7 +151,7 @@
+ 	    jnilocate "$jhome/lib/amd64"
+     fi
+ elif [ "$javac" = "yes" ]; then
+- if [ `uname` = "Darwin" ];  then
++ if [ `uname` = "Darwin" -a -d "$xcode_jdk" ];  then
+   dir="$xcode_jdk"
+  else
+   dir="$jhome/bin"

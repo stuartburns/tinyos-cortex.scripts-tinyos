@@ -1,0 +1,12 @@
+diff -ur --exclude=.svn tinyos-2.1.2/tools/platforms/mica/uisp/configure.in build-tinyos-msp430-tinyos-main/tools/platforms/mica/uisp/configure.in
+--- tinyos-2.1.2/tools/platforms/mica/uisp/configure.in	2013-01-30 12:00:47.000000000 +0900
++++ build-tinyos-msp430-tinyos-main/tools/platforms/mica/uisp/configure.in	2013-01-30 11:28:41.000000000 +0900
+@@ -24,7 +24,7 @@
+ dnl Process this file with autoconf to produce a configure script.
+ AC_INIT(src/Main.C)
+ AC_CONFIG_AUX_DIR(config)
+-AM_CONFIG_HEADER(src/config.h:src/config-h.in)
++AC_CONFIG_HEADER(src/config.h:src/config-h.in)
+ AM_INIT_AUTOMAKE(uisp, 20050519tinyos)
+ AC_CANONICAL_HOST
+ 
